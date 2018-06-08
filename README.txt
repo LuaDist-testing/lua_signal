@@ -1,9 +1,13 @@
 This is a signal library for Lua 5.1. It depends on ANSI C signals and has
 some extensions that are available in POSIX, such as kill().
 
-The library should compile cleanly and easily as a shared object:
+Use Make to compile and install:
 
-gcc -shared -o signal.so lsignal.c
+make && make install
+
+You can set the destination manually using:
+
+make install DESTINATION=/path/to/location
 
 This code is distributed under the same license as Lua 5.0. You may view
 the license at the top of any of the source files.
@@ -14,21 +18,31 @@ the license at the top of any of the source files.
 
 All of these functions are placed inside the signal table.
 
-signal(sig, handler)
+old_handler, err = signal(sig, handler)
   sig = number or string representing the signal for the handler.
-  handler = nil or a function, nil to clear a previous handler, and function
-            to set the handler.
+  handler = nil or "default" --> set signal handling to default (SIG_DFL)
+            "ignore" --> set signal handling to ignore (SIG_IGN)
+            function --> sets handler to run upon receipt of the signal
+Notes: Registers a signal handler for `sig`. Can also set the signal handler
+       to default behavior (as defined by the OS) or set the signal handler to
+       ignore the signal.
 
-raise(sig)
+status[, err] = raise(sig)
   sig = number or string representing the signal for the handler.
+Notes: Sends signal `sig` to itself.
 
 ========================
 
 For POSIX compliant systems, the following are defined:
 
-kill(pid, sig)
+status[, err] = kill(pid, sig)
   pid = number representing the process to receive the signal.
   sig = number or string representing the signal to be sent.
+Notes: Sends to the process identified by the integer `pid` the signal `sig`.
+
+status[, err] = pause()
+Notes: Pauses the execution of the process until delivery of a signal that would
+       cause a signal handler to run or terminate the process.
 
 ========================
 
